@@ -9,6 +9,8 @@ ZIGFLAGS = build-obj -target x86-freestanding -mcpu=i386 -O ReleaseSmall
 BOOT_SECTOR     = boot.asm
 KERNEL_ENTRY    = kernel_entry.asm
 MAIN_ZIG        = main.zig
+IMPORT_DIR      = imports
+IMPORTS_ZIG     = $(IMPORT_DIR)/vga.zig $(IMPORT_DIR)/input.zig $(IMPORT_DIR)/strings.zig $(IMPORT_DIR)/kshell.zig
 LINKER_SCRIPT   = linker.ld
 
 BOOT_BIN        = $(BUILD)/boot.bin
@@ -28,7 +30,7 @@ $(BOOT_BIN): $(BOOT_SECTOR) | $(BUILD)
 $(ENTRY_OBJ): $(KERNEL_ENTRY) | $(BUILD)
 	$(NASM) -f elf32 $< -o $@
 
-$(MAIN_OBJ): $(MAIN_ZIG) imports/vga.zig imports/input.zig | $(BUILD)
+$(MAIN_OBJ): $(MAIN_ZIG) $(IMPORTS_ZIG) | $(BUILD)
 	$(ZIG) build-obj $(MAIN_ZIG) -target x86-freestanding -mcpu=i386 -O ReleaseSmall -fno-stack-protector -femit-bin=$@
 
 $(KERNEL_BIN): $(ENTRY_OBJ) $(MAIN_OBJ)

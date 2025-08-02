@@ -72,25 +72,41 @@ pub const textmode = struct {
         var buff: [128]u8 = undefined;
         var i: usize = 0;
 
+        writechar('|', y, x, c); // inits the cursor
         while (true) {
             const key: u8 = ps2.getkey();
             if (key == ps2.NOVALUE_INPUT) continue;
 
+            const debugmsg: []const u8 = &[_]u8{ 'K', 'E', 'Y', ' ', key, ' ', 'P', 'R', 'E', 'S', 'S', 'E', 'D', '!' };
+            writeline(debugmsg, 24, 79 - 14, null);
+
             if (key == '\n') {
+                writechar(' ', y, x, c); // clean up the extra |
                 currentline += 1;
                 y += 1;
                 x = 0;
                 break;
             }
 
-            if (key == 0x08) {
+            if (key == '\x08') {
+                writechar(' ', y, x, c); // clean up the extra |
                 if (x == 0) {
                     currentline -= 1;
                     y -= 1;
-                    x = MAX_X - 2;
+                    if (i > 0) {
+                        i -= 1;
+                    }
+                    x = MAX_X - 1;
+                } else {
+                    x -= 1;
+                    if (i > 0) {
+                        i -= 1;
+                    }
                 }
-                i -= 1;
-                writechar(' ', y, x, c);
+
+                buff[i] = ' ';
+                writechar('|', y, x, c);
+                writechar(' ', y, x + 1, c); // clean up the extra |
                 continue;
             }
 
@@ -108,6 +124,7 @@ pub const textmode = struct {
                     y = 0;
                 }
                 writechar(buff[i], y, x, c);
+                if (x < MAX_X) writechar('|', y, x + 1, c);
                 i += 1;
                 x += 1;
             }

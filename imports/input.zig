@@ -6,7 +6,7 @@ pub const PS2 = struct {
 
         // Control characters
         map[0x01] = 0x1B; // ESC
-        map[0x0E] = 0x08; // Backspace
+        map[0x0E] = '\x08'; // Backspace
         map[0x0F] = '\t'; // Tab
         map[0x1C] = '\n'; // Enter
         map[0x39] = ' '; // Spacebar
@@ -110,7 +110,7 @@ pub const PS2 = struct {
         return decodecode(inb(0x60));
     }
 
-    /// (DISCONTINUED) Returns a zig string (max size of 128) of non-echoed input ended by a newline.
+    /// Returns a zig string (max size of 128) of non-echoed input ended by a newline.
     pub fn getstring() []const u8 {
         var buff: [128]u8 = undefined;
         var i: usize = 0;
@@ -123,7 +123,7 @@ pub const PS2 = struct {
                 break;
             }
 
-            if (key == 0x08) {
+            if (key == '\x08') {
                 i -= 1;
                 continue;
             }
