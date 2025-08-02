@@ -7,3 +7,5 @@ runninbg make run should work
 ```make run```
 or to just build it run
 ```make```
+## issues (i noticed so far):
+- backspace doesnt work
