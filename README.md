@@ -1,5 +1,5 @@
 # spos - zig
-my stupid kernel i made for funsie but in zig, thanks to micl for giving me a great base (the asm)
+my stupid kernel i made for funsie but in zig, thanks to [micl](https://micl.dev/) for giving me a great base (the asm)
 ## dependancys:
 - nasm, ld. zig 1.14, qemu
 ## usage:
