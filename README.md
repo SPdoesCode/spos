@@ -8,4 +8,5 @@ runninbg make run should work
 or to just build it run
 ```make```
 ## issues (i noticed so far):
-- backspace doesnt work
+- echo sometimes glitches
+- you can delete basicly everything on screen
