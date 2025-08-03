@@ -1,4 +1,4 @@
-const ps2 = @import("input.zig").PS2;
+const ps2 = @import("input.zig").ps2;
 
 /// The text mode driver for writing to vga while in textmode.
 pub const textmode = struct {
@@ -132,20 +132,4 @@ pub const textmode = struct {
 
         return buff[0..i];
     }
-
-    /// A basic gui libary
-    pub const GUI = struct {
-        /// A Minimal titlebar thats quite basic.
-        pub fn titlebar(chars: []const u8, ocolor: ?u8) void {
-            const color: u8 = ocolor orelse normcolor;
-            clearscreen(color);
-            writeline("__|", 0, null, color);
-            writeline(chars, 0, 3, color);
-            var i: usize = 4 + chars.len;
-            writeline("|", 0, @intCast(i - 1), color);
-            while (i < MAX_X) : (i += 1) {
-                writeline("_", 0, @intCast(i), color);
-            }
-        }
-    };
 };

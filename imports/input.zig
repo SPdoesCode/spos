@@ -1,5 +1,32 @@
+/// Gets a byte of input from a port.
+pub fn inb(port: u16) u8 {
+    return asm volatile ("inb %[port], %[result]"
+        : [result] "={al}" (-> u8),
+        : [port] "{dx}" (port),
+        : "memory"
+    );
+}
+
+/// gets a long from the port
+pub fn inl(port: u16) u32 {
+    return asm volatile ("inl %[port], %[result]"
+        : [result] "={eax}" (-> u32),
+        : [port] "{dx}" (port),
+        : "memory"
+    );
+}
+
+/// gets a bit more than a long from a port
+pub fn inw(port: u16) u16 {
+    return asm volatile ("inw %[port], %[result]"
+        : [result] "={ax}" (-> u16),
+        : [port] "{dx}" (port),
+        : "memory"
+    );
+}
+
 /// Simple PS2 driver for the 0x60 port.
-pub const PS2 = struct {
+pub const ps2 = struct {
     /// Default keymap.
     pub const keymap: [128]u8 = blk: {
         var map: [128]u8 = undefined;
@@ -76,24 +103,6 @@ pub const PS2 = struct {
     };
 
     pub const NOVALUE_INPUT: u8 = 255;
-
-    /// Gets a byte of input from a port.
-    pub fn inb(port: u16) u8 {
-        return asm volatile ("inb %[port], %[ret]"
-            : [ret] "={al}" (-> u8),
-            : [port] "{dx}" (port),
-        );
-    }
-
-    /// Outputs a byte to a port.
-    pub fn outb(port: u16, value: u8) void {
-        asm volatile ("outb %[value], %[port]"
-            :
-            : [value] "{al}" (value),
-              [port] "{dx}" (port),
-            : "memory"
-        );
-    }
 
     /// Decodes a key code, good to use with inb.
     pub fn decodecode(code: u8) u8 {

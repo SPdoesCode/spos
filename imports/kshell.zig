@@ -1,4 +1,7 @@
 const string = @import("strings.zig").utils;
+const virtio = @import("drivers/ide.zig").virtio;
+const conv = @import("conv.zig");
+
 /// The vga driver prompt.
 pub const vga = struct {
     /// The textmode part of vga.
@@ -23,6 +26,13 @@ pub const vga = struct {
             } else if (string.cmp(cmd, "clear")) {
                 vgaout.clearscreen(shellcolor);
                 vgaout.currentline = 0;
+            } else if (string.cmp(cmd, "getblocks")) {
+                virtio.detectblock();
+                vgaout.writeline("Found:", null, null, shellcolor);
+                for (virtio.io_bases[0..virtio.device_count]) |base| {
+                    vgaout.writeline(conv.u16_to.hex(base), null, null, shellcolor);
+                }
+                vgaout.writeline("Done!", null, null, shellcolor);
             } else {
                 vgaout.writeline("COMMAND: ", null, null, shellcolor);
                 vgaout.writeline(cmd, null, null, shellcolor);

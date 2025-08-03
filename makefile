@@ -10,7 +10,7 @@ BOOT_SECTOR     = boot.asm
 KERNEL_ENTRY    = kernel_entry.asm
 MAIN_ZIG        = main.zig
 IMPORT_DIR      = imports
-IMPORTS_ZIG     = $(IMPORT_DIR)/vga.zig $(IMPORT_DIR)/input.zig $(IMPORT_DIR)/strings.zig $(IMPORT_DIR)/kshell.zig
+IMPORTS_ZIG     = $(IMPORT_DIR)/vga.zig $(IMPORT_DIR)/input.zig $(IMPORT_DIR)/strings.zig $(IMPORT_DIR)/kshell.zig $(IMPORT_DIR)/drivers/ide.zig
 LINKER_SCRIPT   = linker.ld
 
 BOOT_BIN        = $(BUILD)/boot.bin
@@ -18,8 +18,9 @@ ENTRY_OBJ       = $(BUILD)/kernel_entry.o
 MAIN_OBJ        = $(BUILD)/main.o
 KERNEL_BIN      = $(BUILD)/kernel.bin
 OS_IMAGE        = $(BUILD)/os.img
+DISK_IMG        = $(BUILD)/disk.img
 
-all: $(OS_IMAGE)
+all: $(OS_IMAGE) $(DISK_IMG)
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -36,13 +37,16 @@ $(MAIN_OBJ): $(MAIN_ZIG) $(IMPORTS_ZIG) | $(BUILD)
 $(KERNEL_BIN): $(ENTRY_OBJ) $(MAIN_OBJ)
 	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) --oformat binary -o $@ $^
 
+$(DISK_IMG): | $(BUILD)
+	qemu-img create -f raw $@ 32G
+
 $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
 	dd if=/dev/zero of=$@ bs=512 count=2880
 	dd if=$(BOOT_BIN) of=$@ bs=512 conv=notrunc
 	dd if=$(KERNEL_BIN) of=$@ bs=512 seek=1 conv=notrunc
 
-run: $(OS_IMAGE)
-	qemu-system-x86_64 -fda $< -m 128 -vga std
+run: $(OS_IMAGE) $(DISK_IMG)
+	qemu-system-x86_64 -fda $(OS_IMAGE) -drive file=$(DISK_IMG),format=raw,if=virtio -m 128 -vga std
 
 clean:
 	rm -rf $(BUILD)
