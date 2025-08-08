@@ -1,52 +1,72 @@
-ZIG      = zig
-NASM     = nasm
-LD       = ld
-BUILD    = .build
+# Tools
+CC      = gcc
+NASM    = nasm
+LD      = ld
 
-TARGET   = x86-freestanding
-ZIGFLAGS = build-obj -target x86-freestanding -mcpu=i386 -O ReleaseSmall
+# Flags
+CFLAGS  = -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include
+NASM_BIN = -f bin
+NASM_ELF = -f elf32
+LDFLAGS  = -m elf_i386 -T boot/linker.ld --oformat binary
 
-BOOT_SECTOR     = boot.asm
-KERNEL_ENTRY    = kernel_entry.asm
-MAIN_ZIG        = main.zig
-IMPORT_DIR      = imports
-IMPORTS_ZIG     = $(IMPORT_DIR)/vga.zig $(IMPORT_DIR)/input.zig $(IMPORT_DIR)/strings.zig $(IMPORT_DIR)/kshell.zig $(IMPORT_DIR)/drivers/ide.zig
-LINKER_SCRIPT   = linker.ld
+# Directories
+BUILD = .build
 
-BOOT_BIN        = $(BUILD)/boot.bin
-ENTRY_OBJ       = $(BUILD)/kernel_entry.o
-MAIN_OBJ        = $(BUILD)/main.o
-KERNEL_BIN      = $(BUILD)/kernel.bin
-OS_IMAGE        = $(BUILD)/os.img
-DISK_IMG        = $(BUILD)/disk.img
+# Sources
+BOOT_SECTOR   = boot/boot.asm
+KERNEL_ENTRY  = boot/kernel_entry.asm
 
-all: $(OS_IMAGE) $(DISK_IMG)
+KERNEL_C_SRCS = \
+	kernel/kernel.c \
+	kernel/sys/mem.c \
+	kernel/sys/portio.c \
+	kernel/std/strings.c \
+	kernel/drivers/ps2.c \
+	kernel/drivers/vga/legacy.c \
+	kernel/drivers/vga/textmode.c \
+	kernel/drivers/serialport.c \
+	kernel/drivers/keymap.c
 
+KERNEL_OBJS = $(KERNEL_C_SRCS:%.c=$(BUILD)/%.o)
+ENTRY_OBJ   = $(BUILD)/kernel_entry.o
+BOOT_BIN    = $(BUILD)/boot.bin
+KERNEL_BIN  = $(BUILD)/kernel.bin
+OS_IMAGE    = $(BUILD)/os.img
+
+# Default target
+all: $(OS_IMAGE)
+
+# Create build directory
 $(BUILD):
 	mkdir -p $(BUILD)
 
-$(BOOT_BIN): $(BOOT_SECTOR) | $(BUILD)
-	$(NASM) -f bin $< -o $@
+# Compile .c files
+$(BUILD)/%.o: %.c | $(BUILD)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
+# Assemble kernel entry
 $(ENTRY_OBJ): $(KERNEL_ENTRY) | $(BUILD)
-	$(NASM) -f elf32 $< -o $@
+	$(NASM) $(NASM_ELF) $< -o $@
 
-$(MAIN_OBJ): $(MAIN_ZIG) $(IMPORTS_ZIG) | $(BUILD)
-	$(ZIG) build-obj $(MAIN_ZIG) -target x86-freestanding -mcpu=i386 -O ReleaseSmall -fno-stack-protector -femit-bin=$@
+# Assemble boot sector
+$(BOOT_BIN): $(BOOT_SECTOR) | $(BUILD)
+	$(NASM) $(NASM_BIN) $< -o $@
 
-$(KERNEL_BIN): $(ENTRY_OBJ) $(MAIN_OBJ)
-	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) --oformat binary -o $@ $^
+# Link kernel
+$(KERNEL_BIN): $(ENTRY_OBJ) $(KERNEL_OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^
 
-$(DISK_IMG): | $(BUILD)
-	qemu-img create -f raw $@ 32G
-
+# Create OS floppy image
 $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
 	dd if=/dev/zero of=$@ bs=512 count=2880
 	dd if=$(BOOT_BIN) of=$@ bs=512 conv=notrunc
 	dd if=$(KERNEL_BIN) of=$@ bs=512 seek=1 conv=notrunc
 
-run: $(OS_IMAGE) $(DISK_IMG)
-	qemu-system-x86_64 -fda $(OS_IMAGE) -drive file=$(DISK_IMG),format=raw,if=virtio -m 128 -vga std
+# Run with QEMU
+run: $(OS_IMAGE)
+	qemu-system-x86_64 -fda $< -m 128 -vga std
 
+# Clean build
 clean:
 	rm -rf $(BUILD)
