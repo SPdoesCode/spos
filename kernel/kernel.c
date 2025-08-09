@@ -1,5 +1,8 @@
 #include <drivers/vga/textmode.h>
 #include <drivers/serialport.h>
+#include <sys/sysinfo.h>
+#include <std/stddef.h>
+#include <std/strings.h>
 
 void halt(void) {
     for (;;) {
@@ -9,10 +12,12 @@ void halt(void) {
 
 void kmain(void) {
     clearscreen(0x00);
-    writeline("Hello World!", 0, 0, 0x0F);
-    writeline("This is spos!", 0, 1, 0x0F);
     serialportsetup();
-    serialwriteline("Hello world!");
-    serialwriteline("This is spos, but from serial output!");
+    uint32_t mem = getrambytes();
+    writeline("found mem (kb):", 0, 0, 0x0F);
+    serialwriteline("Found mem (kb): ");
+    writeline(itoa((mem / 1024)), 1, 1, 0x0F);
+    serialwriteline(itoa((mem / 1024)));
+
     halt();
 }
