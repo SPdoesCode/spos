@@ -13,11 +13,9 @@ void halt(void) {
 void kmain(void) {
     clearscreen(0x00);
     serialportsetup();
-    uint32_t mem = getrambytes();
     writeline("found mem (kb):", 0, 0, 0x0F);
     serialwriteline("Found mem (kb): ");
-    writeline(itoa((mem / 1024)), 1, 1, 0x0F);
-    serialwriteline(itoa((mem / 1024)));
+
 
     halt();
 }
