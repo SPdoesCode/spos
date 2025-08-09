@@ -11,26 +11,29 @@ size_t strlen(char *str) {
 }
 
 // Convert a int to a string.
-char* itoa(uint32_t value) {
-    static char str[16];   // persists between calls
-    char temp[16];
+char itoa_buffer[16];
+// Convert a int to a string.
+char* itoa(uint32_t value) { // Thank you micl for helping me fix this :)
     int i = 0;
+    int j = 0;
 
     if (value == 0) {
-        str[0] = '0';
-        str[1] = '\0';
-        return str;
+        itoa_buffer[0] = '0';
+        itoa_buffer[1] = '\0';
+        return itoa_buffer;
     }
 
     while (value > 0 && i < 15) {
-        temp[i++] = '0' + (value % 10);
+        itoa_buffer[i++] = '0' + (value % 10);
         value /= 10;
     }
 
-    for (int j = 0; j < i; j++) {
-        str[j] = temp[i - j - 1];
+    for (j = 0; j < i / 2; j++) {
+        char temp = itoa_buffer[j];
+        itoa_buffer[j] = itoa_buffer[i - j - 1];
+        itoa_buffer[i - j - 1] = temp;
     }
 
-    str[i] = '\0';
-    return str;
+    itoa_buffer[i] = '\0';
+    return itoa_buffer;
 }
