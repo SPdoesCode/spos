@@ -1,0 +1,27 @@
+[
+  {
+    "directory": "/path/to/spos",
+    "command": "clang -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include -c kernel/kernel.c -o kernel/kernel.o",
+    "file": "kernel/kernel.c"
+  },
+  {
+    "directory": "/path/to/spos",
+    "command": "clang -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include -c kernel/drivers/vga/legacy.c -o kernel/drivers/vga/legacy.o",
+    "file": "kernel/drivers/vga/legacy.c"
+  },
+  {
+    "directory": "/path/to/spos",
+    "command": "clang -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include -c kernel/drivers/keymap.c -o kernel/drivers/keymap.o",
+    "file": "kernel/drivers/keymap.c"
+  },
+  {
+    "directory": "/path/to/spos",
+    "command": "clang -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include -c kernel/sys/sysinfo.c -o kernel/sys/sysinfo.o",
+    "file": "kernel/sys/sysinfo.c"
+  },
+  {
+    "directory": "/path/to/spos",
+    "command": "clang -m32 -ffreestanding -nostdlib -Wall -Wextra -fno-pic -fno-pie -no-pie -Ikernel/include -c kernel/std/strings.c -o kernel/std/strings.o",
+    "file": "kernel/std/strings.c"
+  }
+]
