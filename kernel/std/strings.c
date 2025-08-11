@@ -37,3 +37,15 @@ char* itoa(uint32_t value) { // Thank you micl for helping me fix this :)
     itoa_buffer[i] = '\0';
     return itoa_buffer;
 }
+
+char* strcat(char* dest,char* src) {
+    char *d = dest;
+    while (*d) {
+        d++;
+    }
+    while (*src) {
+        *d++ = *src++;
+    }
+    *d = '\0';
+    return dest;
+}

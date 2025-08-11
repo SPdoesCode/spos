@@ -16,16 +16,7 @@ BUILD = .build
 BOOT_SECTOR   = boot/boot.asm
 KERNEL_ENTRY  = boot/kernel_entry.asm
 
-KERNEL_C_SRCS = \
-	kernel/kernel.c \
-	kernel/sys/mem.c \
-	kernel/sys/portio.c \
-	kernel/std/strings.c \
-	kernel/drivers/ps2.c \
-	kernel/drivers/vga/legacy.c \
-	kernel/drivers/vga/textmode.c \
-	kernel/drivers/serialport.c \
-	kernel/drivers/keymap.c
+KERNEL_C_SRCS := $(shell find kernel/ -type f -name "*.c")
 
 KERNEL_OBJS = $(KERNEL_C_SRCS:%.c=$(BUILD)/%.o)
 ENTRY_OBJ   = $(BUILD)/kernel_entry.o
@@ -65,7 +56,7 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
 
 # Run with QEMU
 run: $(OS_IMAGE)
-	qemu-system-x86_64 -fda $< -m 128 -vga std
+	qemu-system-x86_64 -fda $< -m 128 -vga std -serial stdio
 
 # Clean build
 clean:

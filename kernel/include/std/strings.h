@@ -11,5 +11,6 @@
 // Basic string utilitys
 size_t strlen(char *str);
 char* itoa(uint32_t value);
+char* strcat(char* dest, char* src);
 
 #endif
