@@ -1,6 +1,8 @@
 #include <drivers/serialport.h>
 #include <sys/portio.h>
 #include <std/stddef.h>
+#include <std/stdarg.h>
+#include <std/strings.h>
 
 void serialportsetup(void) {
     outb(SERIAL_COM1_PORT + 1, 0x00);
@@ -27,4 +29,40 @@ void serialwriteline(char *msg) {
         serialwritechar(msg[x]);
         x++;
     }
+}
+
+void serialprintln(char *msg, ...) {
+    va_list ap;
+    va_start(ap, msg);
+
+    while (*msg) {
+        if (*msg == '%') {
+            switch (*(msg + 1)) {
+                case 'd':
+                    ;
+                    char* num = itoa(va_arg(ap, int));
+                    for (int i = 0; num[i] != '\0'; i++) {
+                        serialwritechar(num[i]);
+                    }
+                    msg+=2;
+                    break;
+                case 's':
+                    ;
+                    char* tmp = va_arg(ap, char*);
+                    for (int i = 0; tmp[i] != '\0'; i++) {
+                        serialwritechar(tmp[i]);
+                    }
+                    msg+=2;
+                    break;
+                default:
+                    msg++;
+                    break;
+            }
+        } else {
+            serialwritechar(*(msg));
+            msg++;
+        }
+    }
+    serialwriteline("\r\n");
+    va_end(ap);
 }

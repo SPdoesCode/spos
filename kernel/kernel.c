@@ -12,59 +12,22 @@ void halt(void) {
 
 
 void kmain(void) {
-    clearscreen(0x00);
+    txtclearscreen(0x00);
     serialportsetup();
     fillramentrys();
     pci_scan();
-    serialwriteline("Found mem (kb): ");
-    serialwriteline(itoa((total_memory_bytes / 1024)));
-    serialwriteline("\r\n");
-    serialwriteline("Found device(s): \r\n");
-    serialwriteline("#. <device id> : <vendor id> : <class code> : <slot> : <subclass> : <prog if>\r\n");
+    serialprintln("Found ram (kb): %d", (total_memory_bytes / 1024));
+    serialprintln("Found device(s):");
+    serialprintln("#. <device id> : <vendor id> : <class code> : <slot> : <subclass> : <prog if>");
     for (size_t i = 0; i < pci_entry_num; i++) {
-        serialwriteline(itoa(i));
-        serialwriteline(". ");
-        serialwriteline(itoa(pcientrys[i].device_id));
-        serialwriteline(" : ");
-        serialwriteline(itoa(pcientrys[i].vendor_id));
-        serialwriteline(" : ");
-        serialwriteline(pciclasstostring(pcientrys[i].class_code));
-        serialwriteline(" : ");
-        serialwriteline(itoa((uint16_t)pcientrys[i].slot));
-        serialwriteline(" : ");
-        serialwriteline(itoa((uint16_t)pcientrys[i].subclass));
-        serialwriteline(" : ");
-        serialwriteline(itoa((uint16_t)pcientrys[i].prog_if));
-        serialwriteline("\r\n");
+        serialprintln("%d. %s : %s : %s : %s : %s : %s", i, itoa(pcientrys[i].device_id), itoa(pcientrys[i].vendor_id), pciclasstostring(pcientrys[i].class_code), itoa((uint16_t)pcientrys[i].slot), itoa((uint16_t)pcientrys[i].subclass), itoa((uint16_t)pcientrys[i].prog_if));
     }
 
-    writeline("Found mem (kb): ", 0, 0, 0x0F);
-    writeline(itoa((total_memory_bytes / 1024)), 18, 0, 0x0F);
-    writeline("Found device(s): ", 0, 1, 0x0F);
-    writeline("#. <device id> : <vendor id> : <class code> : <slot> : <subclass> : <prog if>", 0, 2, 0x0F);
-
-    uint8_t y = 3;
-
+    txtprintln(0x0F, "Found ram (kb): %d", (total_memory_bytes / 1024));
+    txtprintln(0x0F, "Found device(s): ");
+    txtprintln(0x0F, "#. <device id> : <vendor id> : <class code> : <slot> : <subclass> : <prog if>");
     for (size_t i = 0; i < pci_entry_num; i++) {
-        char buf[50];
-        strcat(buf, itoa(i));
-        strcat(buf, ". ");
-        strcat(buf, itoa(pcientrys[i].device_id));
-        strcat(buf, " : ");
-        strcat(buf, itoa(pcientrys[i].vendor_id));
-        strcat(buf, " : ");
-        strcat(buf, pciclasstostring(pcientrys[i].class_code));
-        strcat(buf, " : ");
-        strcat(buf, itoa((uint16_t)pcientrys[i].slot));
-        strcat(buf, " : ");
-        strcat(buf, itoa((uint16_t)pcientrys[i].subclass));
-        strcat(buf, " : ");
-        strcat(buf, itoa((uint16_t)pcientrys[i].prog_if));
-        writeline(buf, 0, y, 0x0F);
-        for (size_t i = 0; i < strlen(buf); i++) {
-            buf[i] = '\0';
-        }
-        y++;
+        txtprintln(0x0F, "%d. %s : %s : %s : %s : %s : %s", i, itoa(pcientrys[i].device_id), itoa(pcientrys[i].vendor_id), pciclasstostring(pcientrys[i].class_code), itoa((uint16_t)pcientrys[i].slot), itoa((uint16_t)pcientrys[i].subclass), itoa((uint16_t)pcientrys[i].prog_if));
     }
 
     halt();

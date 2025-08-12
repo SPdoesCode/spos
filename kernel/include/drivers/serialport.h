@@ -16,5 +16,6 @@ void serialportsetup(void);
 uint8_t transmissionempty(void);
 void serialwritechar(char c);
 void serialwriteline(char *msg);
+void serialprintln(char* msg, ...);
 
 #endif

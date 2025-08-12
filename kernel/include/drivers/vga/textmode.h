@@ -14,9 +14,17 @@
 #define DEF_VGA_CLEAR_COLOR 0x00
 
 typedef uint8_t vga_color;
+typedef struct vgachar {
+    char c;
+    vga_color color;
+} vgachar_t;
 
-void writechar(char c, uint16_t x, uint16_t y, vga_color color);
-void writeline(char *c, uint16_t x, uint16_t y, vga_color color);
-void clearscreen(vga_color color);
+extern vgachar_t vgatxtbuff[MAX_VGA_X * MAX_VGA_Y];
+extern uint8_t current_txt_y, current_txt_x;
+
+void txtwritechar(char c, uint16_t x, uint16_t y, vga_color color);
+void txtwriteline(char *c, uint16_t x, uint16_t y, vga_color color);
+void txtclearscreen(vga_color color);
+void txtprintln(vga_color color, char* msg, ...);
 
 #endif
