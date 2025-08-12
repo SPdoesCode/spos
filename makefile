@@ -56,7 +56,7 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
 
 # Run with QEMU
 run: $(OS_IMAGE)
-	qemu-system-x86_64 -fda $< -m 128 -vga std -serial stdio
+	qemu-system-x86_64 -fda $< -m 1G -vga std -serial stdio
 
 # Clean build
 clean:
