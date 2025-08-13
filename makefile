@@ -23,6 +23,8 @@ ENTRY_OBJ   = $(BUILD)/kernel_entry.o
 BOOT_BIN    = $(BUILD)/boot.bin
 KERNEL_BIN  = $(BUILD)/kernel.bin
 OS_IMAGE    = $(BUILD)/os.img
+OS_DRIVE	= $(BUILD)/drive.img
+DRIVE_SIZE	= 20G
 
 # Default target
 all: $(OS_IMAGE)
@@ -54,9 +56,12 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
 	dd if=$(BOOT_BIN) of=$@ bs=512 conv=notrunc
 	dd if=$(KERNEL_BIN) of=$@ bs=512 seek=1 conv=notrunc
 
+$(OS_DRIVE):
+	qemu-img create -f raw $(OS_DRIVE) $(DRIVE_SIZE)
+
 # Run with QEMU
-run: $(OS_IMAGE)
-	qemu-system-x86_64 -fda $< -m 1G -vga std -serial stdio
+run: $(OS_IMAGE) $(OS_DRIVE)
+	qemu-system-x86_64 -fda $(OS_IMAGE) -drive file=$(OS_DRIVE),if=ide,format=raw -m 1G -vga std -serial stdio
 
 # Clean build
 clean:

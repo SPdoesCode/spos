@@ -53,6 +53,9 @@ void kmain(void) {
         );
     }
 
+    serialprintln("Looking for mountable devices...");
+    txtprintln(0x0F, "Looking for mountable devices...");
+
     ide_initialize(
         LEGACY_PRIMARY_IO,
         LEGACY_PRIMARY_CTRL,
@@ -60,6 +63,9 @@ void kmain(void) {
         LEGACY_SECOND_CTRL,
         LEGACY_BMIDE
     );
+
+    serialprintln("Muntable device(s):");
+    txtprintln(0x0F, "Mountable device(s):");
 
     for (int i = 0; i < 4; i++) {
         if (ide_dev_buff[i].reserve == 0) continue;  // Skip non-existing devices
