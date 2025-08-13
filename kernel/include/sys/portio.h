@@ -21,4 +21,6 @@ void outb(port16_t p, uint8_t v);
 void outw(port16_t p, uint16_t v);
 void outl(port16_t p, uint32_t v);
 
+void insl(uint16_t p, void* addr, uint32_t c);
+
 #endif

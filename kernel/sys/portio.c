@@ -36,3 +36,12 @@ void outw(port16_t p, uint16_t v) {
 void outl(port16_t p, uint32_t v) {
      __asm__ volatile ("outl %0, %1":: "a"(v), "Nd"(p));
 }
+
+void insl(uint16_t p, void* addr, uint32_t c) {
+    asm volatile (
+        "rep insl"
+        : "+D"(addr), "+c"(c)
+        : "d"(p)
+        : "memory"
+    );
+}
