@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-Ikernel/include]
+  Add: [-Iinclude]

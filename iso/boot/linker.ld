@@ -19,4 +19,7 @@ SECTIONS
     .bss : {
         *(.bss)
     }
+
+    __kernel_end = .;
+
 }
